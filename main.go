@@ -12,7 +12,7 @@ import (
 // TODO: add to env
 var port = ":8000"
 var session, _ = mgo.Dial("127.0.0.1")
-var c = session.DB("TutDb").C("ToDo")
+var c = session.DB("TodoDB").C("Todo")
 
 func main() {
 	session.SetMode(mgo.Monotonic, true)
