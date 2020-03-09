@@ -1,24 +1,26 @@
 package main
 
 import (
-	"io"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/theantichris/todo-api/handlers"
+	"gopkg.in/mgo.v2"
 )
 
+// TODO: add to env
+var port = ":8000"
+var session, _ = mgo.Dial("127.0.0.1")
+var c = session.DB("TutDb").C("ToDo")
+
 func main() {
+	session.SetMode(mgo.Monotonic, true)
+	defer session.Close()
+
 	router := mux.NewRouter()
-	router.HandleFunc("/health", Health).Methods("GET")
+	router.HandleFunc("/health", handlers.Health).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":8000", router))
-}
-
-// Health handles the GET request to /health.
-func Health(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-
-	io.WriteString(w, `{"alive": true}`)
+	// TODO: gracefully exit on interrupt
+	log.Fatal(http.ListenAndServe(port, router))
 }
