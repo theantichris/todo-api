@@ -16,10 +16,21 @@ func TestHealth(t *testing.T) {
 	router.HandleFunc("/health", Health).Methods("GET")
 	router.ServeHTTP(response, req)
 
-	got := response.Body.String()
-	want := `{"alive": true}`
+	t.Run("it returns 200 status code", func(t *testing.T) {
+		got := response.Result().StatusCode
+		want := 200
 
-	if got != want {
-		t.Errorf("got %s want %s", got, want)
-	}
+		if got != want {
+			t.Errorf("got %d want %d", got, want)
+		}
+	})
+
+	t.Run("it returns correct body", func(t *testing.T) {
+		got := response.Body.String()
+		want := `{"alive": true}`
+
+		if got != want {
+			t.Errorf("got %s want %s", got, want)
+		}
+	})
 }
