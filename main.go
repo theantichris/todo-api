@@ -15,15 +15,16 @@ import (
 
 // TODO: add to env
 var port = ":8000"
-var db, _ = mgo.Dial("127.0.0.1")
-var c = db.DB("TodoDB").C("Todo")
+var session, _ = mgo.Dial("127.0.0.1")
+var db = session.DB("TodoDB").C("Todo")
 
 func main() {
-	db.SetMode(mgo.Monotonic, true)
-	defer db.Close()
+	session.SetMode(mgo.Monotonic, true)
+	defer session.Close()
 
 	router := mux.NewRouter()
-	router.HandleFunc("/health", handlers.HealthCheckHandler).Methods("GET")
+	router.HandleFunc("/health", handlers.HealthCheckHandler).Methods(http.MethodGet)
+	router.HandleFunc("/todo", handlers.AddTodoItemHandler(db)).Methods(http.MethodPost)
 
 	server := &http.Server{
 		Addr:         "0.0.0.0" + port,
