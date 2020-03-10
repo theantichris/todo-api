@@ -25,6 +25,8 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/health", handlers.HealthCheckHandler).Methods(http.MethodGet)
 	router.HandleFunc("/todo", handlers.AddTodoItemHandler(db)).Methods(http.MethodPost)
+	router.HandleFunc("/todo", handlers.GetTodoItemHandler(db)).Methods(http.MethodGet)
+	router.HandleFunc("/todo/{id}", handlers.GetTodoItemHandler(db)).Methods(http.MethodGet)
 
 	server := &http.Server{
 		Addr:         "0.0.0.0" + port,
