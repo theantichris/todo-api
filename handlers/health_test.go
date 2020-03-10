@@ -6,31 +6,22 @@ import (
 	"testing"
 )
 
-func TestHealth(t *testing.T) {
+func TestHealthCheckHandler(t *testing.T) {
 	request, err := http.NewRequest(http.MethodGet, "/health", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	response := httptest.NewRecorder()
-	handler := http.HandlerFunc(Health)
+	handler := http.HandlerFunc(HealthCheckHandler)
 	handler.ServeHTTP(response, request)
 
-	t.Run("it returns 200 status code", func(t *testing.T) {
-		got := response.Result().StatusCode
-		want := 200
+	if status := response.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+	}
 
-		if got != want {
-			t.Errorf("got %d want %d", got, want)
-		}
-	})
-
-	t.Run("it returns correct body", func(t *testing.T) {
-		got := response.Body.String()
-		want := `{"alive": true}`
-
-		if got != want {
-			t.Errorf("got %s want %s", got, want)
-		}
-	})
+	expected := `{"alive": true}`
+	if body := response.Body.String(); body != expected {
+		t.Errorf("handler return unexpected body: got %v want %v", body, expected)
+	}
 }

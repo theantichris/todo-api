@@ -19,7 +19,7 @@ func main() {
 	defer session.Close()
 
 	router := mux.NewRouter()
-	router.HandleFunc("/health", handlers.Health).Methods("GET")
+	router.HandleFunc("/health", handlers.HealthCheckHandler).Methods("GET")
 
 	// TODO: gracefully exit on interrupt
 	log.Fatal(http.ListenAndServe(port, router))
