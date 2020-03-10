@@ -24,7 +24,7 @@ func AddTodoItemHandler(db *mgo.Collection) http.HandlerFunc {
 			Done:        false,
 		})
 
-		// TODO: this is always returning the first TodoItem that has that description.
+		// TODO: Change from FormValue to JSON.
 		result := models.TodoItem{}
 		_ = db.Find(bson.M{"description": r.FormValue("description")}).One(&result)
 		json.NewEncoder(w).Encode(result)
@@ -44,6 +44,7 @@ func GetTodoItemHandler(db *mgo.Collection) http.HandlerFunc {
 		vars := mux.Vars(r)
 		id := vars["id"]
 
+		// TODO: Split this out.
 		if id != "" {
 			results = GetByID(id, db)
 		} else {
@@ -55,6 +56,8 @@ func GetTodoItemHandler(db *mgo.Collection) http.HandlerFunc {
 
 	return http.HandlerFunc(fn)
 }
+
+// TODO: Move this out of the handler.
 
 // GetByID gets a TodoItem by ID.
 func GetByID(id string, db *mgo.Collection) []models.TodoItem {
