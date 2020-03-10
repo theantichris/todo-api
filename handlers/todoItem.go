@@ -61,6 +61,7 @@ func GetTodoItemHandler(db *mgo.Collection) http.HandlerFunc {
 // CompleteTodoItemHandler marks a TodoItem as done.
 func CompleteTodoItemHandler(db *mgo.Collection) http.HandlerFunc {
 	// TODO: This could use a lot of clean up.
+	// TODO: Handle if item is already marked as done?
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
@@ -74,6 +75,27 @@ func CompleteTodoItemHandler(db *mgo.Collection) http.HandlerFunc {
 		} else {
 			w.WriteHeader(http.StatusNoContent)
 			io.WriteString(w, `{"updated": true}`)
+		}
+	}
+
+	return http.HandlerFunc(fn)
+}
+
+// DeleteTodoItemHandler deletes a TodoItem.
+func DeleteTodoItemHandler(db *mgo.Collection) http.HandlerFunc {
+	// TODO: Clean up needed.
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		vars := mux.Vars(r)
+		id := bson.ObjectIdHex(vars["id"])
+
+		err := db.RemoveId(id)
+		if err == mgo.ErrNotFound {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(err.Error())
+		} else {
+			io.WriteString(w, `{"result": "OK"}`)
 		}
 	}
 
