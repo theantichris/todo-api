@@ -4,17 +4,17 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/gorilla/mux"
 )
 
 func TestHealth(t *testing.T) {
-	req, _ := http.NewRequest(http.MethodGet, "/health", nil)
-	response := httptest.NewRecorder()
+	request, err := http.NewRequest(http.MethodGet, "/health", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	router := mux.NewRouter()
-	router.HandleFunc("/health", Health).Methods("GET")
-	router.ServeHTTP(response, req)
+	response := httptest.NewRecorder()
+	handler := http.HandlerFunc(Health)
+	handler.ServeHTTP(response, request)
 
 	t.Run("it returns 200 status code", func(t *testing.T) {
 		got := response.Result().StatusCode
