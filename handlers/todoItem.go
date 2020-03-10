@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"time"
 
@@ -52,6 +53,28 @@ func GetTodoItemHandler(db *mgo.Collection) http.HandlerFunc {
 		}
 
 		json.NewEncoder(w).Encode(results)
+	}
+
+	return http.HandlerFunc(fn)
+}
+
+// CompleteTodoItemHandler marks a TodoItem as done.
+func CompleteTodoItemHandler(db *mgo.Collection) http.HandlerFunc {
+	// TODO: This could use a lot of clean up.
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		vars := mux.Vars(r)
+		id := bson.ObjectIdHex(vars["id"])
+
+		err := db.Update(bson.M{"_id": id}, bson.M{"$set": bson.M{"done": true}})
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+			io.WriteString(w, `{"updated": false, "error": `+err.Error()+`}`)
+		} else {
+			w.WriteHeader(http.StatusNoContent)
+			io.WriteString(w, `{"updated": true}`)
+		}
 	}
 
 	return http.HandlerFunc(fn)

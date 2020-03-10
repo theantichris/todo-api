@@ -27,6 +27,7 @@ func main() {
 	router.HandleFunc("/todo", handlers.AddTodoItemHandler(db)).Methods(http.MethodPost)
 	router.HandleFunc("/todo", handlers.GetTodoItemHandler(db)).Methods(http.MethodGet)
 	router.HandleFunc("/todo/{id}", handlers.GetTodoItemHandler(db)).Methods(http.MethodGet)
+	router.HandleFunc("/todo/{id}", handlers.CompleteTodoItemHandler(db)).Methods(http.MethodPatch)
 
 	server := &http.Server{
 		Addr:         "0.0.0.0" + port,
